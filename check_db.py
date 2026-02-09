@@ -22,15 +22,13 @@ total_quotes = cur.fetchone()[0]
 cur.execute("SELECT COUNT(*) FROM quotes WHERE list IS true")
 total_list_rows = cur.fetchone()[0]
 
-print(f"=" * 50)
-print(f"📊 DATABASE SUMMARY")
-print(f"=" * 50)
+print("DATABASE SUMMARY")
 print(f"Total quote rows: {total_quotes}")
 print(f"Total list rows: {total_list_rows}")
 print(f"Grand total: {total_quotes + total_list_rows}")
-print(f"=" * 50)
 print()
-print(f"Showing latest 5 quotes:\n")
+print("Showing latest 5 quotes:")
+print()
 
 cur.execute("SELECT * FROM quotes ORDER BY inserted_at DESC LIMIT 5")
 rows = cur.fetchall()
@@ -43,6 +41,6 @@ for row in rows:
     print(f"Partial: {row[5]}")
     if row[3]:
         print(f"State: {json.dumps(row[3], indent=2)}")
-    print("-" * 50)
+    print()
 
 conn.close()
