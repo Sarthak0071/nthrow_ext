@@ -6,6 +6,7 @@ from nthrow.source import SimpleSource
 class QuoteExtractor(SimpleSource):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # disable cache so we make real http calls
         self.use_cache = False
 
     def make_url(self, row, _type):

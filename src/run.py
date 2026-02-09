@@ -19,27 +19,22 @@ DB_CONFIG = {
 
 
 async def main():
-    """
-    Extract all pages from quotes.toscrape.com.
-    Matches the nthrow test pattern: multiple collect_rows() calls in one execution.
-    """
     conn = create_db_connection(**DB_CONFIG)
     create_store(conn, TABLE_NAME)
     
     extractor = QuoteExtractor(conn, TABLE_NAME)
     extractor.set_list_info("https://quotes.toscrape.com/")
     
-    # Clean old data - matches test pattern (line 37)
+    # clear old data before starting
     uri_clean(extractor.uri, conn, TABLE_NAME)
     
     async with await extractor.create_session() as session:
         extractor.session = session
         
-        # First page
+        # grab first page
         await extractor.collect_rows(extractor.get_list_row())
         
-        # Continue while pagination exists
-        # This matches what the tests do - multiple collect_rows() calls
+        # keep going until we hit the end
         while extractor.should_run_again():
             row = extractor.get_list_row()
             next_page = row.get("state", {}).get("pagination", {}).get("to")
@@ -48,11 +43,11 @@ async def main():
                 break
                 
             print(f"Fetching page {next_page}...")
-            extractor._reset_run_times()  # Reset like the test does (line 84)
+            extractor._reset_run_times()
             await extractor.collect_rows(row)
     
     count = uri_row_count(extractor.uri, conn, TABLE_NAME, partial=False)
-    print(f"\n✓ Extraction complete! Total quotes: {count}")
+    print(f"\nDone! Got {count} quotes total")
     
     conn.close()
 
